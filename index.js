@@ -104,13 +104,9 @@ module.exports = function (options) {
       updateState(win);
     }
 
-    // Save state
-    try {
-      mkdirp.sync(path.dirname(fullStoreFileName));
-      jsonfile.writeFileSync(fullStoreFileName, state);
-    } catch (err) {
-      // Don't care
-    }
+    return mkdirp.mkdirp(path.dirname(fullStoreFileName))
+      .then(() => jsonfile.writeFile(fullStoreFileName, state))
+      .catch(() => { /* Don’t care */ });
   }
 
   function stateChangeHandler() {
@@ -126,7 +122,7 @@ module.exports = function (options) {
   function closedHandler() {
     // Unregister listeners and save state
     unmanage();
-    saveState();
+    void saveState();
   }
 
   function manage(win) {

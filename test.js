@@ -4,7 +4,7 @@ import sinon from 'sinon';
 
 test.before(() => {
   const jsonfileMock = {
-    writeFileSync() {},
+    writeFile() {},
     readFileSync() {}
   };
   const electronMock = {
@@ -17,7 +17,7 @@ test.before(() => {
   };
   mockery.registerAllowables(['./', 'path', 'object-assign', 'deep-equal', 'sinon', './lib/keys.js', './lib/is_arguments.js']);
   mockery.registerMock('electron', electronMock);
-  mockery.registerMock('mkdirp', {sync() {}});
+  mockery.registerMock('mkdirp', {mkdirp() {}});
   mockery.registerMock('jsonfile', jsonfileMock);
   mockery.enable({
     useCleanCache: true,
@@ -154,10 +154,10 @@ test('saves the state to the file system', t => {
   const screenBounds = {x: 0, y: 0, width: 100, height: 100};
 
   const mkdirp = require('mkdirp');
-  sinon.spy(mkdirp, 'sync');
+  sinon.spy(mkdirp, 'mkdirp');
 
   const jsonfile = require('jsonfile');
-  sinon.spy(jsonfile, 'writeFileSync');
+  sinon.spy(jsonfile, 'writeFile');
 
   const {screen} = require('electron');
   sinon.stub(screen, 'getDisplayMatching').returns({bounds: screenBounds});
@@ -165,8 +165,8 @@ test('saves the state to the file system', t => {
   const state = require('.')({defaultWidth: 1000, defaultHeight: 2000});
   state.saveState(win);
 
-  t.truthy(mkdirp.sync.calledOnce);
-  t.truthy(jsonfile.writeFileSync.calledWith('/temp/window-state.json', {
+  t.truthy(mkdirp.mkdirp.calledOnce);
+  t.truthy(jsonfile.writeFile.calledWith('/temp/window-state.json', {
     x: 100,
     y: 100,
     width: 500,
@@ -176,9 +176,9 @@ test('saves the state to the file system', t => {
     displayBounds: screenBounds
   }));
 
-  jsonfile.writeFileSync.restore();
+  jsonfile.writeFile.restore();
   screen.getDisplayMatching.restore();
-  mkdirp.sync.restore();
+  mkdirp.mkdirp.restore();
 });
 
 test('Validate state if saved display is available and primary', t => {
