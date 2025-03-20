@@ -3,7 +3,7 @@
 const path = require('path');
 const electron = require('electron');
 const jsonfile = require('jsonfile');
-const mkdirp = require('mkdirp');
+const fs = require('fs/promises');
 
 module.exports = function (options) {
   const app = electron.app || electron.remote.app;
@@ -104,7 +104,7 @@ module.exports = function (options) {
       updateState(win);
     }
 
-    return mkdirp.mkdirp(path.dirname(fullStoreFileName))
+    return fs.mkdir(path.dirname(fullStoreFileName), { recursive: true })
       .then(() => jsonfile.writeFile(fullStoreFileName, state))
       .catch(() => { /* Don’t care */ });
   }
